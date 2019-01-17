@@ -7,13 +7,13 @@ Create a docker image put these files inside a folder and execute the following 
 
 Start the container and enter inside
 
-    docker run -it cashier_app /bin/bash
+    docker run --rm -it cashier_app /bin/bash
 
 Start the container as detached
 
     docker run -d cashier_app /bin/bash
 
-Start tests
+Run tests
 
-    docker-compose run app rspec
+    docker-compose up
 

@@ -10,3 +10,4 @@ RUN set -ex && bundle install --jobs 20 --retry 5
 
 COPY . /app
 RUN set -ex && bundle install --jobs 20 --retry 5
+CMD ["/bin/bash"]
