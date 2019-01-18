@@ -1,0 +1,62 @@
+Checkout
+  initialization
+    initializes the items list as an empty Array
+  #scan
+    registers item in the items list
+    does not change items list if item is nil
+    does not stores a new item when adding an existing one
+    increments item quantity when adding an existing item
+  #total
+    without any pricing rule
+      and an empty basket
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      for just 1 item
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      for only one type of items
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      for items added randomly
+        behaves like a good cashier
+          calculating the happy price applying promotions
+    with only items with BuyOneGetOneFree pricing rule
+      for a basket with just 1 item
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      for a basket with an even number of items
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      for a basket with an odd number of items
+        behaves like a good cashier
+          calculating the happy price applying promotions
+    with only items with BulkWithFinalAbsolutePrice pricing rule
+      for a less quantity of items than minimum
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      for the minimum quantity ot items
+        behaves like a good cashier
+          calculating the happy price applying promotions
+    with only items with BulkWithFinalRelativePrice pricing rule
+      for a less quantity of items than minimum
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      for the minimum quantity ot items
+        behaves like a good cashier
+          calculating the happy price applying promotions
+    with a mix of products and pricing rules
+      like basket 1
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      like basket 2
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      like basket 3
+        behaves like a good cashier
+          calculating the happy price applying promotions
+      like basket 4
+        behaves like a good cashier
+          calculating the happy price applying promotions
+
+Finished in 0.01758 seconds (files took 0.11398 seconds to load)
+20 examples, 0 failures
