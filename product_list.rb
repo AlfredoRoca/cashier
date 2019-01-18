@@ -13,9 +13,9 @@ class ProductList
     products = Array.new
     file_lines = IO.readlines(data_file)
     file_lines.each do |line|
-      code, name, unit_price, pricing_rule = line.split(',')
+      code, name, unit_price, pricing_rule, minimum, promotion = line.split(',')
       begin
-        products.push Product.new(code, name, unit_price, pricing_rule)
+        products.push Product.new(code, name, unit_price, pricing_rule, minimum, promotion)
       rescue StandardError => error
         puts error.message, "Error in line: #{line}"
       end

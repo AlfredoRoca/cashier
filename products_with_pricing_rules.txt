@@ -1,3 +1,3 @@
 GR1, Green tea, 3.11, BuyOneGetOneFree
-SR1, Strawberries, 5.00, BulkWithFinalAbsolutePrice
-CF1, Coffee, 11.23, BulkWithFinalRelativePrice
+SR1, Strawberries, 5.00, BulkWithFinalAbsolutePrice, 3, 4.5
+CF1, Coffee, 11.23, BulkWithFinalRelativePrice, 3, 0.666666667
