@@ -58,5 +58,5 @@ Checkout
         behaves like a good cashier
           calculating the happy price applying promotions
 
-Finished in 0.01758 seconds (files took 0.11398 seconds to load)
+Finished in 0.01853 seconds (files took 0.10291 seconds to load)
 20 examples, 0 failures
