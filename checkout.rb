@@ -11,7 +11,7 @@ class Checkout
   def scan(item)
     return unless item
 
-    found = @items_list.bsearch { |item_in_list| item_in_list.product.code == item.code }
+    found = @items_list.select { |item_in_list| item_in_list.product.code == item.code }.first
     @items_list.delete(found)
 
     return @items_list.push(Item.new(item, found.quantity + 1)) if found
