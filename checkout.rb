@@ -1,10 +1,9 @@
 require './item.rb'
 
 class Checkout
-  attr_reader :items_list, :pricing_rules
+  attr_reader :items_list
 
-  def initialize(pricing_rules = [])
-    @pricing_rules = pricing_rules
+  def initialize
     @items_list = []
   end
 

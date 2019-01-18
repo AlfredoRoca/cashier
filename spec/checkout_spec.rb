@@ -9,15 +9,21 @@ def get_list_of_products_with_pricing_rules
   ProductList.new('products_with_pricing_rules.txt').products
 end
 
-RSpec.describe Checkout do
+RSpec.shared_examples 'a good cashier' do
+  it 'calculating the happy price applying promotions' do
+    co = described_class.new
+    basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
 
-  describe 'initialization' do
-    it 'stores provided pricing_rules as an Array' do
-      pricing_rules = ['dummy content']
-
-      expect(described_class.new(pricing_rules).pricing_rules).to eq pricing_rules
+    if defined? rounded && rounded then
+      expect(co.total).to be_within(0.01).of(expectation)
+    else
+      expect(co.total).to eq expectation
     end
+  end
+end
 
+RSpec.describe Checkout do
+  describe 'initialization' do
     it 'initializes the items list as an empty Array' do
       expect(described_class.new.items_list).to eq []
     end
@@ -63,139 +69,137 @@ RSpec.describe Checkout do
 
   describe '#total' do
     context 'without any pricing rule' do
-      it 'returns 0 if items list is empty' do
-        co = described_class.new
-
-        expect(co.total).to eq 0
+      context 'and an empty basket' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_without_pricing_rules }
+          let(:basket) { [] }
+          let(:expectation) { 0 }
+        end
       end
 
-      it 'returns item unit price for just 1 item' do
-        products = get_list_of_products_without_pricing_rules
-        co = described_class.new
-        basket = %w[GR1]
-        expectation = 3.11 * basket.size
-        basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
-
-        expect(co.total).to eq expectation
+      context 'for just 1 item' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_without_pricing_rules }
+          let(:basket) { %w[GR1] }
+          let(:expectation) { 3.11 * basket.size }
+        end
       end
 
-      it 'returns total price for a basket with only one type of item' do
-        products = get_list_of_products_without_pricing_rules
-        co = described_class.new
-        basket = %w[SR1 SR1 SR1]
-        expectation = 5 * basket.size
-        basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
-
-        expect(co.total).to eq expectation
+      context 'for only one type of items' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_without_pricing_rules }
+          let(:basket) { %w[SR1 SR1 SR1] }
+          let(:expectation) { 5 * basket.size }
+        end
       end
 
-      it 'returns the sum of total prices when items are added randomly' do
-        products = get_list_of_products_without_pricing_rules
-        co = described_class.new
-        basket = %w[SR1 GR1 SR1 GR1 CF1]
-        expectation = 27.45
-        basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
-
-        expect(co.total).to eq expectation
+      context 'for items added randomly' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_without_pricing_rules }
+          let(:basket) { %w[SR1 GR1 SR1 GR1 CF1] }
+          let(:expectation) { 27.45 }
+        end
       end
     end
 
     context 'with only items with BuyOneGetOneFree pricing rule' do
-      context 'for a basket with an even number of items' do
-        it 'returns the price with promotion' do
-          products = get_list_of_products_with_pricing_rules
-          co = described_class.new
-          basket = %w[GR1 GR1 GR1 GR1 GR1 GR1]
-          expectation = 9.33
-          basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
+      context 'for a basket with just 1 item' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[GR1] }
+          let(:expectation) { 3.11 }
+        end
+      end
 
-          expect(co.total).to eq expectation
+      context 'for a basket with an even number of items' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[GR1 GR1 GR1 GR1 GR1 GR1] }
+          let(:expectation) { 9.33 }
         end
       end
 
       context 'for a basket with an odd number of items' do
-        it 'returns the price with promotion' do
-          products = get_list_of_products_with_pricing_rules
-          co = described_class.new
-          basket = %w[GR1 GR1 GR1 GR1 GR1]
-          expectation = 9.33
-          basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
-
-          expect(co.total).to eq expectation
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[GR1 GR1 GR1 GR1 GR1] }
+          let(:expectation) { 9.33 }
         end
       end
     end
 
     context 'with only items with BulkWithFinalAbsolutePrice pricing rule' do
       context 'for a less quantity of items than minimum' do
-        it 'returns the price without discount' do
-          products = get_list_of_products_with_pricing_rules
-          co = described_class.new
-          basket = %w[SR1 SR1]
-          expectation = 5 * basket.size
-          basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
-
-          expect(co.total).to eq expectation
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[SR1 SR1] }
+          let(:expectation) { 5 * basket.size }
         end
       end
 
       context 'for the minimum quantity ot items' do
-        it 'returns the price with discount' do
-          products = get_list_of_products_with_pricing_rules
-          co = described_class.new
-          basket = %w[SR1 SR1 SR1]
-          expectation = 4.5 * basket.size
-          basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
-
-          expect(co.total).to eq expectation
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[SR1 SR1 SR1] }
+          let(:expectation) { 4.5 * basket.size }
         end
       end
     end
 
     context 'with only items with BulkWithFinalRelativePrice pricing rule' do
       context 'for a less quantity of items than minimum' do
-        it 'returns the price without discount' do
-          products = get_list_of_products_with_pricing_rules
-          co = described_class.new
-          basket = %w[CF1 CF1]
-          expectation = 11.23 * basket.size
-          basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
-
-          expect(co.total).to eq expectation
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[CF1 CF1] }
+          let(:expectation) { 11.23 * basket.size }
         end
       end
 
       context 'for the minimum quantity ot items' do
-        it 'returns the price with discount' do
-          products = get_list_of_products_with_pricing_rules
-          co = described_class.new
-          basket = %w[CF1 CF1 CF1]
-          expectation = 7.486666667 * basket.size
-          basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
-
-          expect(co.total).to be_within(0.1).of(expectation)
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[CF1 CF1 CF1] }
+          let(:expectation) { 7.486666667 * basket.size }
+          let(:rounded) { true }
         end
       end
     end
 
-# Basket: GR1,SR1,GR1,GR1,CF1
-# Total price expected: ​ £22.45
-# Basket: GR1,GR1
-# Total price expected: ​ £3.11
-# Basket: SR1,SR1,GR1,SR1
-# Total price expected:​ £16.61
-# Basket: GR1,CF1,SR1,CF1,CF1
-# Total price expected:​ £30.57
-
     context 'with a mix of products and pricing rules' do
-      it 'returns the happy price for the basket 1' do
-        products = get_list_of_products_with_pricing_rules
-        co = described_class.new
-        basket = %w[GR1 SR1 GR1 GR1 CF1]
-        expectation = 22.45
-        basket.each { |item| co.scan(products.select { |product| product.code == item }.first) }
+      context 'like basket 1' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[GR1 SR1 GR1 GR1 CF1] }
+          let(:expectation) { 22.45 }
+          let(:rounded) { true }
+        end
+      end
 
-        expect(co.total).to be_within(0.1).of(expectation)
+      context 'like basket 2' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[GR1 GR1] }
+          let(:expectation) { 3.11 }
+          let(:rounded) { true }
+        end
+      end
+
+      context 'like basket 3' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[SR1 SR1 GR1 SR1] }
+          let(:expectation) { 16.61 }
+          let(:rounded) { true }
+        end
+      end
+
+      context 'like basket 4' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[GR1 CF1 SR1 CF1 CF1] }
+          let(:expectation) { 30.57 }
+          let(:rounded) { true }
+        end
       end
     end
   end
