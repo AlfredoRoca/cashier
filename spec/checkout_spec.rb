@@ -77,6 +77,14 @@ RSpec.describe Checkout do
         end
       end
 
+      context 'for an unexisting article' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_without_pricing_rules }
+          let(:basket) { %w[RYT] }
+          let(:expectation) { 0 }
+        end
+      end
+
       context 'for just 1 item' do
         it_behaves_like 'a good cashier' do
           let(:products) { get_list_of_products_without_pricing_rules }
@@ -126,6 +134,14 @@ RSpec.describe Checkout do
           let(:expectation) { 9.33 }
         end
       end
+
+      context 'for a basket with an odd number of items and one unexisting one' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[GR1 GR1 PEP GR1 GR1 GR1] }
+          let(:expectation) { 9.33 }
+        end
+      end
     end
 
     context 'with only items with BulkWithFinalAbsolutePrice pricing rule' do
@@ -142,6 +158,14 @@ RSpec.describe Checkout do
           let(:products) { get_list_of_products_with_pricing_rules }
           let(:basket) { %w[SR1 SR1 SR1] }
           let(:expectation) { 4.5 * basket.size }
+        end
+      end
+
+      context 'for the minimum quantity ot items and one unexisting item' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[SR1 SR1 PEP SR1] }
+          let(:expectation) { 4.5 * 3 }
         end
       end
     end
@@ -197,6 +221,15 @@ RSpec.describe Checkout do
         it_behaves_like 'a good cashier' do
           let(:products) { get_list_of_products_with_pricing_rules }
           let(:basket) { %w[GR1 CF1 SR1 CF1 CF1] }
+          let(:expectation) { 30.57 }
+          let(:rounded) { true }
+        end
+      end
+
+      context 'like basket 4 + non existing code' do
+        it_behaves_like 'a good cashier' do
+          let(:products) { get_list_of_products_with_pricing_rules }
+          let(:basket) { %w[GR1 CF1 PEP SR1 CF1 CF1] }
           let(:expectation) { 30.57 }
           let(:rounded) { true }
         end
